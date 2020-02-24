@@ -27,15 +27,25 @@
 <div>
 <ul>
     <li><a href="/zip/{{thing['id']}}">Download</a></li>
-    <li>Added {{thing['added'].humanize()}}</li>
+    <li>Added {{thing['added'].humanize()}} ({{thing['added']}})</li>
     <li>In {{thing['collect_count']}} collections</li>
     <li>Liked {{thing['like_count']}} times</li>
     <li>Downloaded {{thing['download_count']}} times</li>
     <li>License: {{thing['license']}}</li>
 </ul>
 <p>{{thing['details']|safe}}</p>
+<h1>Comments</h1>
+{# Process top level comments #}
+{% for c in comments[''] %}
+<div class="thing_comment">
+<p class="thing_comment_date">{{c['add_date']}}</p>
+<p>{{c['body']}}</p>
+<p>{{c['user_id']}}</p>
+</div>
+{% endfor %}
 <pre>
 {{ ppcontent }}
+{{ ppcomments }}
 {{ ppimages }}
 </pre>
 </div>

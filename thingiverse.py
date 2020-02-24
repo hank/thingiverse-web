@@ -20,17 +20,29 @@ def index():
 @app.route('/thing/<int:thing>')
 def get_thing(thing):
     #_logger.debug('Getting thing {}'.format(thing))
-    with open(os.path.join(THINGJSON_PATH, f"{thing}.json"), "r") as thing_json:
-        thing_j = json.load(thing_json)
+    try:
+        with open(os.path.join(THINGJSON_PATH, f"{thing}.json"), "r") as thing_json:
+            thing_j = json.load(thing_json)
+        # Validate type
+        if not isinstance(thing_j, dict):
+            return "Error 133800: Thing not valid!"
+    except IOError:
+        return "Error 133704: Thing not found"
     try:
         with open(os.path.join(IMAGEJSON_PATH, f"{thing}.json"), "r") as image_json:
             images = json.load(image_json)
     except IOError:
         images = {}
+    try:
+        with open(os.path.join(THINGCOMMENTSJSON_PATH, f"{thing}.json"), "r") as comment_json:
+            comments = json.load(comment_json)
+    except IOError:
+        comments = {'comments':[]}
     # _logger.debug('thing {}'.format(repr(thing_j)))
     thing_j['added'] = arrow.get(thing_j['added'])
     ppcontent = PP.pformat(thing_j)
     ppimages = PP.pformat(images)
+    ppcomments = PP.pformat(comments)
     # Grab image paths for all existing
     images_resolved = []
     for i in images:
@@ -39,7 +51,8 @@ def get_thing(thing):
 
     return render_template('thing.html', thing=thing_j, 
                            images=images, images_resolved=images_resolved,
-                           ppcontent=ppcontent, ppimages=ppimages)
+                           comments=comments['comments'],
+                           ppcontent=ppcontent, ppimages=ppimages, ppcomments=ppcomments)
 
 @app.route('/images/<int:imgid>')
 def send_image(imgid):
