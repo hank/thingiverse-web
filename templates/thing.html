@@ -35,14 +35,25 @@
 </ul>
 <p>{{thing['details']|safe}}</p>
 <h1>Comments</h1>
-{# Process top level comments #}
-{% for c in comments[''] %}
-<div class="thing_comment">
-<p class="thing_comment_date">{{c['add_date']}}</p>
-<p>{{c['body']}}</p>
-<p>{{c['user_id']}}</p>
-</div>
+{# Process comments recursively #}
+{%- macro threaded_comments(n, level) %}
+{% for c in n %}
+    <div class="thing_comment" style="margin-left: {{level*20}}px;">
+        <p class="thing_comment_date">{{c['add_date']}}</p>
+        <p>{{c['body']}}</p>
+        <p>{{c['user_id']}}</p>
+        {% if 'user_id' in c %}
+            {# Pull avatar #}
+            <p><img src="/avatars/{{c['user_id']}}" /><span>{{comments['users'][c['user_id']|string]['user_name']}}</span></p>
+        {% endif %}
+        {% if c['id']|string in comments['comments'] %}
+            {{ threaded_comments(comments['comments'][c['id']|string], level+1) }}
+        {% endif %}
+    </div>
 {% endfor %}
+{%- endmacro %}
+
+{{ threaded_comments(comments['comments'][''], 0) }}
 <pre>
 {{ ppcontent }}
 {{ ppcomments }}

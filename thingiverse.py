@@ -7,6 +7,7 @@ THINGZIP_PATH=os.path.join(BASE_PATH, "files")
 THINGJSON_PATH=os.path.join(BASE_PATH, "thing_json")
 IMAGEJSON_PATH=os.path.join(BASE_PATH, "image_json")
 IMAGE_PATH=os.path.join(BASE_PATH, "images")
+AVATAR_PATH=os.path.join(BASE_PATH, "user_avatars")
 THINGCOMMENTSJSON_PATH=os.path.join(BASE_PATH, "thing_comments_json")
 
 logging.basicConfig(level=logging.DEBUG)
@@ -51,7 +52,7 @@ def get_thing(thing):
 
     return render_template('thing.html', thing=thing_j, 
                            images=images, images_resolved=images_resolved,
-                           comments=comments['comments'],
+                           comments=comments,
                            ppcontent=ppcontent, ppimages=ppimages, ppcomments=ppcomments)
 
 @app.route('/images/<int:imgid>')
@@ -65,6 +66,18 @@ def send_image(imgid):
             break
     if img:
         return send_from_directory(IMAGE_PATH, img)
+
+@app.route('/avatars/<int:imgid>')
+def send_avatar(imgid):
+    exts = ['jpg', 'jpeg', 'gif', 'png']
+    img = None
+    for e in exts:
+        f_name = os.path.join(AVATAR_PATH, f"{imgid}.{e}")
+        if os.path.exists(f_name):
+            img = f"{imgid}.{e}"
+            break
+    if img:
+        return send_from_directory(AVATAR_PATH, img)
 
 @app.route('/zip/<int:tid>')
 def send_zip(tid):
