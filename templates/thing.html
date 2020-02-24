@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+<script>
+   window.addEventListener( 'load', function () {
+       $("#light-slider").lightSlider({
+            gallery:true,
+            item:1,
+            thumbItem:9,
+        });
+    } );
+</script>
+{% endblock %}
+
+{% block header %}
+<h1>{% block title %}Thing {{thing['id']}}: {{thing['name']}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div style="width:50%">
+<ul id="light-slider" style="width:50%">
+	{% for i in images_resolved %}
+	<li data-thumb="{{i}}"><img height=450 src="{{i}}" /></li>
+	{% endfor %}
+</ul>
+</div>
+<div>
+<ul>
+    <li><a href="/zip/{{thing['id']}}">Download</a></li>
+    <li>Added {{thing['added'].humanize()}}</li>
+    <li>In {{thing['collect_count']}} collections</li>
+    <li>Liked {{thing['like_count']}} times</li>
+    <li>Downloaded {{thing['download_count']}} times</li>
+    <li>License: {{thing['license']}}</li>
+</ul>
+<p>{{thing['details']|safe}}</p>
+<pre>
+{{ ppcontent }}
+{{ ppimages }}
+</pre>
+</div>
+{% endblock %}
