@@ -41,10 +41,13 @@
     <div class="thing_comment" style="margin-left: {{level*20}}px;">
         <p class="thing_comment_date">{{c['add_date']}}</p>
         <p>{{c['body']}}</p>
-        <p>{{c['user_id']}}</p>
-        {% if 'user_id' in c %}
+        {% if 'user_id' in c and c['user_id'] is not none %}
             {# Pull avatar #}
-            <p><img src="/avatars/{{c['user_id']}}" /><span>{{comments['users'][c['user_id']|string]['user_name']}}</span></p>
+            <p><img src="/avatars/{{c['user_id']}}" />
+                <span>{{comments['users'][c['user_id']|string]['user_name']}}</span>
+            </p>
+        {% else %}
+            <p><span>Anonymous</span></p>
         {% endif %}
         {% if c['id']|string in comments['comments'] %}
             {{ threaded_comments(comments['comments'][c['id']|string], level+1) }}

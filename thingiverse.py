@@ -26,9 +26,9 @@ def get_thing(thing):
             thing_j = json.load(thing_json)
         # Validate type
         if not isinstance(thing_j, dict):
-            return "Error 133800: Thing not valid!"
+            return render_template('404.html', error="133800: Thing not valid!")
     except IOError:
-        return "Error 133704: Thing not found"
+        return render_template('404.html', error="Error 133704: Thing not found")
     try:
         with open(os.path.join(IMAGEJSON_PATH, f"{thing}.json"), "r") as image_json:
             images = json.load(image_json)
@@ -86,3 +86,8 @@ def send_zip(tid):
         return send_from_directory(THINGZIP_PATH, f"{tid}.zip")
     else:
         return "File not found"
+
+@app.route('/favicon.ico')
+def favicon():
+    if os.path.exists("static/favicon.ico"):
+        return send_from_directory("static", f"favicon.ico")
