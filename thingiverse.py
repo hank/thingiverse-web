@@ -26,9 +26,21 @@ def get_thing(thing):
             thing_j = json.load(thing_json)
         # Validate type
         if not isinstance(thing_j, dict):
-            return render_template('404.html', error="133800: Thing not valid!")
+            f_name = os.path.join(THINGZIP_PATH, f"{thing}.zip")
+            if os.path.exists(f_name):
+                thing_file = f"/zip/{thing}"
+            else:
+                thing_file = None
+            return render_template('404.html', error=133800, message=f"Thing {thing} not valid!", thing_file=thing_file)
     except IOError:
-        return render_template('404.html', error="Error 133704: Thing not found")
+        f_name = os.path.join(THINGZIP_PATH, f"{thing}.zip")
+        if os.path.exists(f_name):
+            thing_file = f"/zip/{thing}"
+        else:
+            thing_file = None
+        return render_template('404.html', error=133704, message=f"Thing {thing} not found!", thing_file=thing_file)
+
+
     try:
         with open(os.path.join(IMAGEJSON_PATH, f"{thing}.json"), "r") as image_json:
             images = json.load(image_json)

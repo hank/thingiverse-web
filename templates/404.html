@@ -133,8 +133,11 @@
     <div id="object11" class="alligator"></div>
 
 	<div id="error-box">
-      <h1>404</h1>
-      <p id="error-message">{{error}}</p>
+      <h1>Error {{error}}</h1>
+      <p id="error-message">{{message}}</p>
+{% if thing_file is not none %}
+      <p>Thing file exists though, download <a href="{{thing_file}}">here</a>.</p>
+{% endif %}
     </div>
     <script type="text/javascript">
       //Set the animated pieces up
