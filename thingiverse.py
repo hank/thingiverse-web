@@ -14,6 +14,12 @@ logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger(os.path.basename(__file__))
 PP = pprint.PrettyPrinter(indent=4)
 
+def _ipath(id_):
+    """Makes a path from the input ID. This includes the subdir from the padded
+       integer"""
+    newfdr = str(id_).zfill(8)[0:4]
+    return newfdr
+
 @app.route('/')
 def index():
     return 'Index Page'
@@ -22,18 +28,18 @@ def index():
 def get_thing(thing):
     #_logger.debug('Getting thing {}'.format(thing))
     try:
-        with open(os.path.join(THINGJSON_PATH, f"{thing}.json"), "r") as thing_json:
+        with open(os.path.join(THINGJSON_PATH, _ipath(thing), f"{thing}.json"), "r") as thing_json:
             thing_j = json.load(thing_json)
         # Validate type
         if not isinstance(thing_j, dict):
-            f_name = os.path.join(THINGZIP_PATH, f"{thing}.zip")
+            f_name = os.path.join(THINGZIP_PATH, _ipath(thing), f"{thing}.zip")
             if os.path.exists(f_name):
                 thing_file = f"/zip/{thing}"
             else:
                 thing_file = None
             return render_template('404.html', error=133800, message=f"Thing {thing} not valid!", thing_file=thing_file)
     except IOError:
-        f_name = os.path.join(THINGZIP_PATH, f"{thing}.zip")
+        f_name = os.path.join(THINGZIP_PATH, _ipath(thing), f"{thing}.zip")
         if os.path.exists(f_name):
             thing_file = f"/zip/{thing}"
         else:
@@ -42,12 +48,12 @@ def get_thing(thing):
 
 
     try:
-        with open(os.path.join(IMAGEJSON_PATH, f"{thing}.json"), "r") as image_json:
+        with open(os.path.join(IMAGEJSON_PATH, _ipath(thing), f"{thing}.json"), "r") as image_json:
             images = json.load(image_json)
     except IOError:
         images = {}
     try:
-        with open(os.path.join(THINGCOMMENTSJSON_PATH, f"{thing}.json"), "r") as comment_json:
+        with open(os.path.join(THINGCOMMENTSJSON_PATH, _ipath(thing), f"{thing}.json"), "r") as comment_json:
             comments = json.load(comment_json)
     except IOError:
         comments = {'comments':[]}
@@ -72,30 +78,30 @@ def send_image(imgid):
     exts = ['jpg', 'jpeg', 'gif', 'png']
     img = None
     for e in exts:
-        f_name = os.path.join(IMAGE_PATH, f"{imgid}.{e}")
+        f_name = os.path.join(IMAGE_PATH, _ipath(imgid), f"{imgid}.{e}")
         if os.path.exists(f_name):
             img = f"{imgid}.{e}"
             break
     if img:
-        return send_from_directory(IMAGE_PATH, img)
+        return send_from_directory(os.path.join(IMAGE_PATH, _ipath(imgid)), img)
 
 @app.route('/avatars/<int:imgid>')
 def send_avatar(imgid):
     exts = ['jpg', 'jpeg', 'gif', 'png']
     img = None
     for e in exts:
-        f_name = os.path.join(AVATAR_PATH, f"{imgid}.{e}")
+        f_name = os.path.join(AVATAR_PATH, _ipath(imgid), f"{imgid}.{e}")
         if os.path.exists(f_name):
             img = f"{imgid}.{e}"
             break
     if img:
-        return send_from_directory(AVATAR_PATH, img)
+        return send_from_directory(os.path.join(AVATAR_PATH, _ipath(imgid)), img)
 
 @app.route('/zip/<int:tid>')
 def send_zip(tid):
-    f_name = os.path.join(THINGZIP_PATH, f"{tid}.zip")
+    f_name = os.path.join(THINGZIP_PATH, _ipath(tid), f"{tid}.zip")
     if os.path.exists(f_name):
-        return send_from_directory(THINGZIP_PATH, f"{tid}.zip")
+        return send_from_directory(os.path.join(THINGZIP_PATH, _ipath(tid)), f"{tid}.zip")
     else:
         return "File not found"
 
