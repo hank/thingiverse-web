@@ -1,5 +1,5 @@
 import logging, os, sys, pprint, json, arrow
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, abort
 app = Flask(__name__)
 
 BASE_PATH="../with_api/thingiverse"
@@ -37,14 +37,14 @@ def get_thing(thing):
                 thing_file = f"/zip/{thing}"
             else:
                 thing_file = None
-            return render_template('404.html', error=133800, message=f"Thing {thing} not valid!", thing_file=thing_file)
+            return render_template('404.html', error=133800, message=f"Thing {thing} not valid!", thing_file=thing_file), 404
     except IOError:
         f_name = os.path.join(THINGZIP_PATH, _ipath(thing), f"{thing}.zip")
         if os.path.exists(f_name):
             thing_file = f"/zip/{thing}"
         else:
             thing_file = None
-        return render_template('404.html', error=133704, message=f"Thing {thing} not found!", thing_file=thing_file)
+        return render_template('404.html', error=133704, message=f"Thing {thing} not found!", thing_file=thing_file), 404
 
 
     try:
@@ -96,6 +96,8 @@ def send_avatar(imgid):
             break
     if img:
         return send_from_directory(os.path.join(AVATAR_PATH, _ipath(imgid)), img)
+    else:
+        abort(404)
 
 @app.route('/zip/<int:tid>')
 def send_zip(tid):
@@ -108,4 +110,8 @@ def send_zip(tid):
 @app.route('/favicon.ico')
 def favicon():
     if os.path.exists("static/favicon.ico"):
-        return send_from_directory("static", f"favicon.ico")
+        return send_from_directory("static", "favicon.ico")
+
+@app.errorhandler(404)
+def page_not_found(error):
+   return render_template('404.html', error=404), 404
